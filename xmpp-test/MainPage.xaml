@@ -5,9 +5,37 @@
     xmlns:local="using:xmpp_test"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" FontFamily="Segoe UI">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Text="Server: "/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="64"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="64"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TitleLabel" HorizontalAlignment="Left" Margin="4,10,0,0" Text="XMPP Client" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="36" FontFamily="Segoe UI" Grid.Column="1" Grid.ColumnSpan="2"/>
+        <Button x:Name="ConnectButton" Content="Connect" Grid.Column="3" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch" IsEnabled="False" Click="ConnectButton_Click"/>
+
+        <TextBlock x:Name="ServerUrlLabel" HorizontalAlignment="Left" Text="Server URL:" FontSize="16" Margin="10,10,0,10" Grid.Row="1" Grid.Column="1"/>
+        <TextBox x:Name="ServerUrlTextbox" Margin="10,10,10,10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Server URL" TextChanged="Textbox_TextChanged"/>
+
+        <TextBlock x:Name="PortLabel" HorizontalAlignment="Left" Text="Server port:" FontSize="16" Margin="10,10,0,10" Grid.Row="2" Grid.Column="1"/>
+        <TextBox x:Name="PortTextbox" Text="5222" Margin="10,10,10,10" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Server URL" InputScope="Number" TextChanged="Textbox_TextChanged"/>
+
+        <TextBlock x:Name="UsernameLabel" HorizontalAlignment="Left" Text="Username:" FontSize="16" Margin="10,10,0,10" Grid.Row="3" Grid.Column="1"/>
+        <TextBox x:Name="UsernameTextbox" Margin="10,10,10,10" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Username" TextChanged="Textbox_TextChanged"/>
+
+        <TextBlock x:Name="PasswordLabel" HorizontalAlignment="Left" Text="Password:" FontSize="16" Margin="10,10,0,10" Grid.Row="4" Grid.Column="1"/>
+        <PasswordBox x:Name="PasswordTextbox" Margin="10,10,10,10" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Password" InputScope="Password" PasswordChanged="Textbox_PasswordChanged"/>
     </Grid>
 </Page>

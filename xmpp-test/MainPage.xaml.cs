@@ -26,5 +26,25 @@ namespace xmpp_test
         {
             this.InitializeComponent();
         }
+
+        private void Textbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ConnectButton.IsEnabled = false;
+            if (UsernameTextbox.Text.Length != 0 && ServerUrlTextbox.Text.Length != 0 && PortTextbox.Text.Length != 0 && PasswordTextbox.Password.Length != 0)
+                ConnectButton.IsEnabled = true;
+        }
+
+        private void Textbox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            ConnectButton.IsEnabled = false;
+            if (UsernameTextbox.Text.Length != 0 && ServerUrlTextbox.Text.Length != 0 && PortTextbox.Text.Length != 0 && PasswordTextbox.Password.Length != 0)
+                ConnectButton.IsEnabled = true;
+        }
+
+        private async void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            ConnectButton.IsEnabled = false;
+            await Xmpp.Connection.Open(ServerUrlTextbox.Text, PortTextbox.Text, UsernameTextbox.Text, PasswordTextbox.Password);
+        }
     }
 }
