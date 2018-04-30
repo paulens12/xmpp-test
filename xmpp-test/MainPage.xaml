@@ -27,15 +27,16 @@
         <Button x:Name="ConnectButton" Content="Connect" Grid.Column="3" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch" IsEnabled="False" Click="ConnectButton_Click"/>
 
         <TextBlock x:Name="ServerUrlLabel" HorizontalAlignment="Left" Text="Server URL:" FontSize="16" Margin="10,10,0,10" Grid.Row="1" Grid.Column="1"/>
-        <TextBox x:Name="ServerUrlTextbox" Margin="10,10,10,10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Server URL" TextChanged="Textbox_TextChanged"/>
+        <TextBox x:Name="ServerUrlTextbox" Margin="10,10,10,10" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Server URL" TextChanged="Textbox_TextChanged" Text="007jabber.com"/>
 
         <TextBlock x:Name="PortLabel" HorizontalAlignment="Left" Text="Server port:" FontSize="16" Margin="10,10,0,10" Grid.Row="2" Grid.Column="1"/>
         <TextBox x:Name="PortTextbox" Text="5222" Margin="10,10,10,10" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Server URL" InputScope="Number" TextChanged="Textbox_TextChanged"/>
 
         <TextBlock x:Name="UsernameLabel" HorizontalAlignment="Left" Text="Username:" FontSize="16" Margin="10,10,0,10" Grid.Row="3" Grid.Column="1"/>
-        <TextBox x:Name="UsernameTextbox" Margin="10,10,10,10" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Username" TextChanged="Textbox_TextChanged"/>
+        <TextBox x:Name="UsernameTextbox" Margin="10,10,10,10" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Username" TextChanged="Textbox_TextChanged" Text="testuser123456"/>
 
         <TextBlock x:Name="PasswordLabel" HorizontalAlignment="Left" Text="Password:" FontSize="16" Margin="10,10,0,10" Grid.Row="4" Grid.Column="1"/>
-        <PasswordBox x:Name="PasswordTextbox" Margin="10,10,10,10" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Password" InputScope="Password" PasswordChanged="Textbox_PasswordChanged"/>
+        <PasswordBox x:Name="PasswordTextbox" Margin="10,10,10,10" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" PlaceholderText="Password" InputScope="Password" PasswordChanged="Textbox_PasswordChanged" Password="testpassword"/>
+        <ProgressRing x:Name="Loading" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch" Grid.Column="4"/>
     </Grid>
 </Page>

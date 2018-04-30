@@ -44,7 +44,16 @@ namespace xmpp_test
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             ConnectButton.IsEnabled = false;
-            await Xmpp.Connection.Open(ServerUrlTextbox.Text, PortTextbox.Text, UsernameTextbox.Text, PasswordTextbox.Password);
+            Loading.IsActive = true;
+            try
+            {
+                Xmpp.Connection conn = await Xmpp.Connection.Open(ServerUrlTextbox.Text, PortTextbox.Text, UsernameTextbox.Text, PasswordTextbox.Password);
+                this.Frame.Navigate(typeof(ChatPage), conn);
+            }
+            finally
+            {
+                Loading.IsActive = false;
+            }
         }
     }
 }

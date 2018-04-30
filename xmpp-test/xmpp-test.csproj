@@ -95,10 +95,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Contact.cs" />
     <Compile Include="Xmpp\Connection.cs" />
-    <Compile Include="PMPage.xaml.cs">
-      <DependentUpon>PMPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ChatPage.xaml.cs">
       <DependentUpon>ChatPage.xaml</DependentUpon>
     </Compile>
@@ -130,10 +128,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="PMPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ChatPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

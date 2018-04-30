@@ -19,8 +19,10 @@ namespace xmpp_test.Xmpp
         private Stream stream;
         private string domain;
         private CancellationTokenSource cancelAllTasks;
+        private string JID = "kompTinkluKlientas";
 
         public event Action<XmlNode> NewData;
+        public event Action<XmlNode> NewIq;
         public event Action StreamClosed;
 
         public static async Task<Connection> Open(string url, string port, string username, string password)
@@ -97,7 +99,8 @@ namespace xmpp_test.Xmpp
             NewData += waitAction;
 
             await Send(GetStreamHeader());
-            while (waiting) ;
+            while (waiting)
+                await Task.Delay(100);
             NewData -= waitAction;
 
             XmlNode mechanisms = null;
@@ -115,6 +118,109 @@ namespace xmpp_test.Xmpp
                     break;
                 }
             }
+
+            waiting = true;
+            waitAction = async (x) =>
+            {
+                waiting = !await BindStream(x);
+            };
+            NewData += waitAction;
+            await Send(GetStreamHeader());
+            while (waiting)
+                await Task.Delay(100);
+            NewData -= waitAction;
+
+            Send("<presence/>");
+        }
+
+        private async Task<bool> BindStream(XmlNode node)
+        {
+            if(node.Name.Equals("stream:stream"))
+            {
+                foreach(XmlNode child in node.ChildNodes)
+                {
+                    if (child.Name.Equals("stream:features"))
+                    {
+                        node = child;
+                        break;
+                    }
+                }
+            }
+            if(node.Name.Equals("stream:features"))
+            {
+                foreach(XmlNode child in node.ChildNodes)
+                {
+                    if(child.Name.Equals("bind"))
+                    {
+                        string iqIdStr = Guid.NewGuid().ToString();
+                        XmlDocument doc = new XmlDocument();
+                        XmlNode iq = doc.CreateElement("iq");
+                        XmlAttribute iqId = doc.CreateAttribute("id");
+                        iqId.Value = iqIdStr;
+                        iq.Attributes.Append(iqId);
+                        XmlAttribute iqType = doc.CreateAttribute("type");
+                        iqType.Value = "set";
+                        iq.Attributes.Append(iqType);
+
+                        XmlNode bind = doc.CreateElement("bind", "urn:ietf:params:xml:ns:xmpp-bind");
+
+                        XmlNode jid = doc.CreateElement("jid");
+                        jid.InnerText = this.JID;
+                        
+                        //bind.AppendChild(jid);
+
+                        iq.AppendChild(bind);
+
+                        bool waiting = true;
+                        bool success = false;
+                        Action<XmlNode> waitAction = (x) =>
+                        {
+                            if(x.Attributes["id"].Value.Equals(iqIdStr))
+                            {
+                                success = FinishBind(x);
+                                waiting = false;
+                            }
+                        };
+                        NewIq += waitAction;
+
+                        //await SendXml(iq);
+
+                        await Send(String.Format("<iq id=\"{0}\" type=\"set\"><bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/></iq>", iqIdStr));
+
+                        while (waiting)
+                            await Task.Delay(100);
+                        NewIq -= waitAction;
+
+                        if (!success)
+                            throw new XmppException("Failed to bind stream.");
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool FinishBind(XmlNode node)
+        {
+            if (node.Attributes["type"].Value.Equals("error"))
+                return false;
+
+            XmlNode bind = null;
+            foreach(XmlNode x in node.ChildNodes)
+                if (x.Name.Equals("bind"))
+                    bind = x;
+            if (bind == null || bind.ChildNodes.Count == 0)
+                return false;
+
+            XmlNode jid = null;
+            foreach (XmlNode x in node.ChildNodes)
+                if (x.Name.Equals("bind"))
+                    jid = x;
+            if (jid == null)
+                return false;
+
+            this.JID = jid.InnerText;
+            return true;
         }
 
         private async Task AuthenticateSASL(string username, string password)
@@ -139,7 +245,8 @@ namespace xmpp_test.Xmpp
             };
             NewData += waitAction;
             await Send(String.Format("<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" mechanism=\"PLAIN\">{0}</auth>", initStr));
-            while (waiting) ;
+            while (waiting)
+                await Task.Delay(100);
             NewData -= waitAction;
 
             if (!success)
@@ -215,15 +322,36 @@ namespace xmpp_test.Xmpp
             */
         }
 
-        private async Task Send(string request)
+        public async Task Send(string request)
         {
+            //request = request.Replace(" xmlns=\"\"", "");
             byte[] msg = Encoding.ASCII.GetBytes(request);
             await stream.WriteAsync(msg, 0, request.Length);
+            Debug.WriteLine("Sent: " + request);
         }
 
-        private async Task SendXml(XmlDocument xml)
+        private async Task SendXml(XmlNode xml)
         {
             await Send(xml.OuterXml);
+        }
+
+        public async Task SendIq(string id, string type, XmlNode childXml)
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlNode iq = doc.CreateElement("iq");
+            XmlAttribute idAttr = doc.CreateAttribute("id");
+            idAttr.Value = id;
+            iq.Attributes.Append(idAttr);
+            XmlAttribute tAttr = doc.CreateAttribute("type");
+            tAttr.Value = type;
+            iq.Attributes.Append(tAttr);
+            XmlAttribute from = doc.CreateAttribute("from");
+            from.Value = JID;
+            iq.Attributes.Append(from);
+
+            XmlNode imported = doc.ImportNode(childXml, true);
+            iq.AppendChild(imported);
+            await SendXml(iq);
         }
 
         private void ReceiveLoop(CancellationToken ct)
@@ -241,7 +369,7 @@ namespace xmpp_test.Xmpp
                 //quit if the stream has been closed
                 if (msg.IndexOf("</stream:stream>") != -1)
                 {
-                    StreamClosed();
+                    StreamClosed?.Invoke();
                     return;
                 }
                 bool wtf = false;
@@ -265,7 +393,9 @@ namespace xmpp_test.Xmpp
 
                 foreach (XmlNode node in nodes)
                 {
-                    NewData(node);
+                    NewData?.Invoke(node);
+                    if (node.Name.Equals("iq"))
+                        NewIq?.Invoke(node);
                 }
             }
         }
